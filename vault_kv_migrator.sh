@@ -14,7 +14,7 @@
 # - For example: time to run, number of directories and keys, etc.
 
 
-set -e
+# set -e
 clear
 
 # Get command line args and put them in an array
@@ -23,7 +23,7 @@ NUM_ARGS=( "$#" )
 
 # Get tokens and path from args
 SRC_TOKEN="${ARGS[1]}"
-DST_TOKEN="${ARGS[3]}"
+DEST_TOKEN="${ARGS[3]}"
 VAULT_PATH="${ARGS[5]}"
 
 # Run time parameters
@@ -105,10 +105,11 @@ function load_config {
   else
     # load the file variables
     TMP_FILE=$(cat ./config.json | jq .tmp_file)
+    TMP_FILE=$(sed -e 's/^"//' -e 's/"$//' <<<$TMP_FILE) # remove double quotes
     TYPE_VAL=$(cat ./config.json | jq .type_val)
-    SRC_URL=$(cat ./config.json | jq .dv_url)
+    SRC_URL=$(cat ./config.json | jq .src_url)
     SRC_URL=$(sed -e 's/^"//' -e 's/"$//' <<<$SRC_URL) # remove double quotes
-    DEST_URL=$(cat ./config.json | jq .dv_url)   
+    DEST_URL=$(cat ./config.json | jq .dest_url)   
     DEST_URL=$(sed -e 's/^"//' -e 's/"$//' <<<$DEST_URL) # remove double quotes
     # Run time parameters
   fi
@@ -120,7 +121,7 @@ function get_keys_from_dev {
   if [[ "$VAULT_PATH" ]]; then
     # Make sure the path always end with '/'
     VAULTS=("${VAULT_PATH%"/"}/")
-    # echo "DEBUG ${LINENO}: Using this path: $VAULT_PATH"
+    # # echo "DEBUG ${LINENO}: Using this path: $VAULT_PATH"
   else
     # Get a list of all secrets engines of a specific type if no path provided.  TODO - Not sure I need this test
     VAULTS=$(vault secrets list -format=json | jq -r 'to_entries[] | select(.value.type == "$TYPE_VAL") | .key')
@@ -139,11 +140,12 @@ function get_keys_from_dev {
 # - Call itself for all path values in the given $PATH
 function recurse {
     arg1="$1"
-    # echo "DEBUG ${LINENO}: Recuse with agrument: " $arg1
+    # # echo "DEBUG ${LINENO}: Recuse with agrument: " $arg1
     
     # Set to source vault
     export VAULT_TOKEN="$SRC_TOKEN"
     export VAULT_ADDR=$SRC_URL
+    # echo "DEBUG ${LINENO}: Using Vault Token: $VAULT_TOKEN and Vault URL: $VAULT_ADDR"
     local readonly KEY_PATH="${arg1}"
 
     # List all folders for a given path 
@@ -155,7 +157,7 @@ function recurse {
         if [[ "${LIST_DIRS_KEYS}" =~ "permission denied" ]]; then
             return
         fi
-        >&2 echo "DEBUG ${LINENO}: ${LIST_DIRS_KEYS}"
+        >&2 # echo "DEBUG ${LINENO}: ${LIST_DIRS_KEYS}"
     fi
 
     # Read the keys in json format 
@@ -179,23 +181,23 @@ function write_key_to_prod {
   KEY_PATH2="${2}"
 
   # production vault
-  export VAULT_TOKEN="${DST_TOKEN}"
-  export VAULT_ADDR="${DST_URL}"
+  export VAULT_TOKEN="${DEST_TOKEN}"
+  export VAULT_ADDR="${DEST_URL}"
   
-  # echo "DEBUG ${LINENO}: Destination token: "
+  # # echo "DEBUG ${LINENO}: Destination token: "
   # TOKEN=$(vault print token) | vault token lookup -format=json $TOKEN | jq .data.id
   
   echo "Get key from DV path: " "${KEY_PATH2}${SECRET2}"
   DST_PATH="${KEY_PATH2/secret/kv}"
   echo "Write key to destination path: " "${DST_PATH}"   
-  # echo "DEBUG ${LINENO}: Put key values      : " $JSON_KEY2
-  echo "${JSON_KEY2}" > "${TMP_FILE}" 2>&1
-
+  # echo "DEBUG ${LINENO}: Put key values: " $JSON_KEY2
+  # echo "DEBUG ${LINENO}: Using json: ${JSON_KEY2} to put in file: ${TMP_FILE}" 
+  echo "${JSON_KEY2}" > ${TMP_FILE} 2>&1
+  
   echo -----------------------------------------------------------------------------------------------------
-  echo "Creating new key in vault PR ${DST_PATH}"
-
+  echo "Creating new key in vault PR ${DST_PATH} with token: $DEST_TOKEN at $DEST_URL"
   PUT_RESULT=$(vault kv put "${DST_PATH}" @"${TMP_FILE}" 2>&1)
-  # echo $PUT_RESULT
+  echo $PUT_RESULT
   
   # GET_RESULT=$(vault kv get $DST_PATH)
   # echo "DEBUG ${LINENO}: Current KV = " $GET_RESULT 
