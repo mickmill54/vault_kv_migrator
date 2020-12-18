@@ -56,6 +56,18 @@ macOS: If you are using brew package manager:
 I only tested and ran this on macOS, but not on Windows or any Linux distributions. I will test Ubuntu at some point and refactor as needed.
 
 ---
+### Running the script
+
+Command line arguments descirption.
+$ vault_kv_migration.sh -s "${SRC_TOKEN}" -d "${DEST_TOKEN}" -p "${VAULT_PATH}"
+
+Usage:
+  Format : ./vault_kv_migrator.sh {source token} {destination token} {path}
+  Example: ./vault_kv_migrator.sh -s xxxxxxx -d xxxxxxx -p /secret/cnn/
+  
+  Note   : A trailing slash in path is required."
+  
+---
 
 #### Here is a bunch of randomish stuff to get started.
 
