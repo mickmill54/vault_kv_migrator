@@ -20,6 +20,13 @@ A couple of notes:
 - Understand what this script is doing before you run it and tweak as needed.
 - You will need to configure the config.json file for your specific use case.
 
+---
+
+NOTE:
+You may notice this pattern - # echo "DEBUG ${LINENO}: "Some string".  This is for debugging this script.  I left them in for your in case you wanted to trace the code.  Sorry if it irritates you.
+
+---
+
 ##### The config.json file:
 This config file is used to reduce the amout of command line arguments and limit the command line arg to:
 - The path to find the secrets

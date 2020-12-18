@@ -1,8 +1,9 @@
 #!/bin/bash
 #====================================================================================================================
-# Name:         dv_pr_vault.sh
+# Name:         vault_kv_migrator.sh
 # Created by:   Mick Miller
 # Created on:   2020-12-15
+# Updated on:   check github commits
 # References: 
 #   https://github.com/hashicorp/vault/issues/5275
 #   https://stackoverflow.com/questions/60932147/hashicorp-vault-export-key-from-one-vault-import-into-another-vault
