@@ -59,43 +59,59 @@ I only tested and ran this on macOS, but not on Windows or any Linux distributio
 Useful vault commands to get started
 
 **login**
+```
 export VAULT_ADDR=https://vault.example.com
 vault login -method=ldap mount=ad username=mick
+```
 
 **view login name**
+```
 TOKEN=$(vault print token) | vault token lookup $TOKEN
+```
 
 **vault logout, I know strange, but effective**
+```
 rm ~/.vault-token
+```
 
 **check the status**
+```
 vault status
+```
 
 **create a secretes engine**
+```
 vault secrets enable -path=kv kv-v2
 vault kv enable-versioning kv
 vault write kv/config max_versions=4
+```
 
 **create ad groups**
+```
 vault write auth/ad/groups/admin-group policies=admins,app1,app1
 vault write auth/ad/groups/app-group policies=app1,app2
 vault read auth/ad/groups/admin-group
 vault read auth/ad/groups/app-group
 vault list auth/ad/groups
+```
 
 **create a policy**
+```
 vault policy write admins ./admins-policy.hcl
 vault policy list
 vault policy read admins
+```
 
 **create 2 secrets**
+```
 vault kv put kv/anthos/test test=12345
 vault kv put kv/gcp/test test=12345
+```
 
 vault kv list kv/anthos
 vault kv list kv/gco
-
 vault kv list -format=json kv/gcp
+```
 
 **Terraform Vault Provider Info**
 *This is a good starting place to learn the provider:*
