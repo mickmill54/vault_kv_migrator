@@ -57,7 +57,7 @@ I only tested and ran this on macOS, but not on Windows or any Linux distributio
 
 ---
 
-####Here is a bunch of randomish stuff to get started.
+#### Here is a bunch of randomish stuff to get started.
 
 Useful vault commands to get started
 
