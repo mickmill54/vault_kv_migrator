@@ -1,7 +1,7 @@
 { 
     "type_val": "general",
-    "dv_url": "https://old_vault.example.com",
-    "pr_url": "https://new_vault.example.com",
+    "src_url": "https://old_vault.example.com",
+    "dest_url": "https://new_vault.example.com",
     "tmp_file": "./tmp.json",
     "config_file":"./config.yaml"
 }

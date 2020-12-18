@@ -9,8 +9,11 @@
 # ===================================================================================================================
 
 # TODO:
+# summary page at the end with stats
+# - For example: time to run, number of directories and keys, etc.
 
-# set -e
+
+set -e
 clear
 
 # Get command line args and put them in an array
@@ -19,7 +22,7 @@ NUM_ARGS=( "$#" )
 
 # Get tokens and path from args
 SRC_TOKEN="${ARGS[1]}"
-DEST_TOKEN="${ARGS[3]}"
+DST_TOKEN="${ARGS[3]}"
 VAULT_PATH="${ARGS[5]}"
 
 # Run time parameters
@@ -102,14 +105,13 @@ function load_config {
     # load the file variables
     TMP_FILE=$(cat ./config.json | jq .tmp_file)
     TYPE_VAL=$(cat ./config.json | jq .type_val)
-    DV_URL=$(cat ./config.json | jq .dv_url)
-    DV_URL=$(sed -e 's/^"//' -e 's/"$//' <<<$DV_URL) # remove double quotes
-    PV_URL=$(cat ./config.json | jq .dv_url)   
-    PV_URL=$(sed -e 's/^"//' -e 's/"$//' <<<$PV_URL) # remove double quotes
+    SRC_URL=$(cat ./config.json | jq .dv_url)
+    SRC_URL=$(sed -e 's/^"//' -e 's/"$//' <<<$SRC_URL) # remove double quotes
+    DEST_URL=$(cat ./config.json | jq .dv_url)   
+    DEST_URL=$(sed -e 's/^"//' -e 's/"$//' <<<$DEST_URL) # remove double quotes
     # Run time parameters
   fi
 }
-
 
 # Get all list of all key paths then recuse path for all keys values.
 function get_keys_from_dev {
@@ -137,11 +139,10 @@ function get_keys_from_dev {
 function recurse {
     arg1="$1"
     # echo "DEBUG ${LINENO}: Recuse with agrument: " $arg1
+    
     # Set to source vault
     export VAULT_TOKEN="$SRC_TOKEN"
-    # echo "DEBUG ${LINENO}: SRV_TOKEN = $SRC_TOKEN"
-    export VAULT_ADDR=$DV_URL
-    # echo "DEBUG ${LINENO}: VAULT_ADDR = $VAULT_ADDR"
+    export VAULT_ADDR=$SRC_URL
     local readonly KEY_PATH="${arg1}"
 
     # List all folders for a given path 
@@ -160,7 +161,7 @@ function recurse {
     for SECRET in $(echo "${LIST_DIRS_KEYS}" | jq -r '.[]'); do
         # echo "DEBUG ${LINENO}: For loop secret:  $SECRET in $LIST_DIRS_KEYS"
         if [[ "${SECRET}" == */ ]]; then # found a parent folder, recurse the folder for keys
-            # echo "DEBUG ${LINENO}: Found parent folder at $arg1$SECRET"
+            # echo "DEBUG ${LINENO}: Found parent folder at $KEY_PATH$SECRET"
             recurse "${KEY_PATH}${SECRET}"
         else # no trailing slash means this is a key and not a folder or subfolder
             echo =====================================================================================================
@@ -177,32 +178,32 @@ function write_key_to_prod {
   KEY_PATH2="${2}"
 
   # production vault
-  export VAULT_TOKEN="${DEST_TOKEN}"
-  export VAULT_ADDR="${PR_URL}"
+  export VAULT_TOKEN="${DST_TOKEN}"
+  export VAULT_ADDR="${DST_URL}"
   
   # echo "Destination token: "
   # TOKEN=$(vault print token) | vault token lookup -format=json $TOKEN | jq .data.id
   
   echo "Get key from DV path: " "${KEY_PATH2}${SECRET2}"
-  PR_PATH="${KEY_PATH2/secret/kv}"
-  echo "Write key to PR path: " "${PR_PATH}"   
+  DST_PATH="${KEY_PATH2/secret/kv}"
+  echo "Write key to destination path: " "${DST_PATH}"   
   # echo "DEBUG ${LINENO}: Put key values      : " $JSON_KEY2
   echo "${JSON_KEY2}" > "${TMP_FILE}" 2>&1
 
   echo -----------------------------------------------------------------------------------------------------
-  echo "Creating new key in vault PR ${PR_PATH}"
+  echo "Creating new key in vault PR ${DST_PATH}"
 
-  PUT_RESULT=$(vault kv put "${PR_PATH}" @"${TMP_FILE}" 2>&1)
+  PUT_RESULT=$(vault kv put "${DST_PATH}" @"${TMP_FILE}" 2>&1)
   # echo $PUT_RESULT
   
-  # GET_RESULT=$(vault kv get $PR_PATH)
+  # GET_RESULT=$(vault kv get $DST_PATH)
   # echo $GET_RESULT
   echo =====================================================================================================
   echo
   
   # set back to dev vault
   export VAULT_TOKEN="${SRC_TOKEN}"
-  export VAULT_ADDR="${DV_URL}"
+  export VAULT_ADDR="${SRC_URL}"
   
   # echo "Source token: " 
   # TOKEN=$(vault print token) | vault token lookup -format=json $TOKEN | jq .data.id
@@ -226,16 +227,20 @@ function clean_up_tmp_file {
 # ========================
 # main
 # ========================
-# test command line args
+# Pre-flight tests
 test_for_vault
 test_for_jq
 test_cmd_line_args
 test_for_trailing_slash
+
+# Load the configs files and initialize variables
 load_config
 
 # Iterate on all kv engines or start from the path provided by the user
 start_job " Hashi Vault migration..."
+
 get_keys_from_dev
 list_new_keys "${VAULT_PATH}"
 clean_up_tmp_file
+
 end_job " Hashi Vault migration."
