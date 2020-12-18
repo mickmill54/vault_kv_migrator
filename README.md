@@ -11,6 +11,7 @@ user2599522: https://stackoverflow.com/a/61000422
 
 ---
 
+### Overview
 This bash script was built primary to migrate a ton of secrets from an old open-source version of Vault to Vault Enterprise.  Surprisingly there was no migration tool from Hashi at the time of this work.
 
 
