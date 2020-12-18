@@ -106,7 +106,6 @@ vault policy read admins
 ```
 vault kv put kv/anthos/test test=12345
 vault kv put kv/gcp/test test=12345
-```
 
 vault kv list kv/anthos
 vault kv list kv/gco
