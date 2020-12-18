@@ -27,7 +27,7 @@ DEST_TOKEN="${ARGS[3]}"
 VAULT_PATH="${ARGS[5]}"
 
 # Run time parameters
-CONFIG_FILE="./config.yaml"
+CONFIG_FILE="./config_migrate.yaml"
 
 # Command line arg missing
 function cmd_line_error {
@@ -99,7 +99,7 @@ function test_for_trailing_slash {
 
 # Load configuration yaml file
 function load_config {
-  if [[ -f "${CONFIG_FILE}" ]]; then 
+  if [[ ! -f "${CONFIG_FILE}" ]]; then 
     cmd_line_error "Error - Missing ${CONFIG_FILE} in current path" 
     exit
   else
@@ -111,7 +111,6 @@ function load_config {
     SRC_URL=$(sed -e 's/^"//' -e 's/"$//' <<<$SRC_URL) # remove double quotes
     DEST_URL=$(cat ${CONFIG_FILE} | jq .dest_url)   
     DEST_URL=$(sed -e 's/^"//' -e 's/"$//' <<<$DEST_URL) # remove double quotes
-    # Run time parameters
   fi
 }
 

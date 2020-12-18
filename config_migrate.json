@@ -2,6 +2,5 @@
     "type_val": "general",
     "src_url": "https://old_vault.example.com",
     "dest_url": "https://new_vault.example.com",
-    "tmp_file": "./tmp.json",
-    "config_file":"./config.yaml"
+    "tmp_file": "./tmp.json"
 }
