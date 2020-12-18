@@ -5,9 +5,14 @@
 ---
 **Much thanks to these folks:**
 
-agaudreault-jive: https://github.com/hashicorp/vault/issues/5275
+agaudreault-jive:
+https://github.com/hashicorp/vault/issues/5275
 
-user2599522: https://stackoverflow.com/a/61000422
+user2599522: 
+https://stackoverflow.com/a/61000422
+
+rvault:
+https://github.com/kir4h/rvault
 
 ---
 
