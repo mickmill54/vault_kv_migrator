@@ -1,44 +1,42 @@
-# Name: Vault kv migration tool
-###### Partial Author: Mick Miller
-###### Date: 2020-12-16
+# Vault kv migration tool
 
----
-**Much thanks to these folks:**
+**Author: Mick Miller**
 
-agaudreault-jive:
-https://github.com/hashicorp/vault/issues/5275
+**Date: 2020-12-16**
 
-user2599522: 
-https://stackoverflow.com/a/61000422
+ 
 
-kir4h:
-https://github.com/kir4h/rvault
+This bash script was built primarily to migrate a ton of secrets from an old, open-source version of Vault to Vault Enterprise. Surprisingly, there was no migration tool available from Hashicorp at the time of this work, so I created one.
 
----
+## Contents
 
-### Overview
-This bash script was built primary to migrate a ton of secrets from an old open-source version of Vault to Vault Enterprise.  Surprisingly there was no migration tool from Hashi at the time of this work.
+1. The config.json file
+2. Installation instructions
+3. Running the script
+4. Useful commands and randomish stuff
+5. References
+6. Acknowledgements
 
+A couple of notes before diving in: 
 
-A couple of notes: 
-- Backup your source secrets engine(s). 
-- Understand what this script is doing before you run it and tweak as needed.
-- You will need to configure the config.json file for your specific use case.
+* Back up your source secrets engine(s). 
+* Understand what this script is doing before you run it and tweak as needed.
+* You will need to configure the config.json file for your specific use case.
 
----
-
-NOTE:
-You may notice this pattern - # echo "DEBUG ${LINENO}: "Some string".  This is for debugging this script.  I left them in for your in case you wanted to trace the code.  Sorry if it irritates you.
+> NOTE: You may notice the pattern `# echo "DEBUG ${LINENO}: "Some string"` in the script. This is used for debugging the script. I left them in for you in case you wanted to trace the code; sorry if it irritates you.
 
 ---
 
-##### The config.json file:
-This config file is used to reduce the amout of command line arguments and limit the command line arg to:
-- The path to find the secrets
-- Not storing the tokens in the cofigs or code
+## 1. The config.json file
 
-**config.json**
-```sh
+This configuration file is used to reduce the amout of command line arguments and limit the arguments to:
+
+* The path to find the secrets; and
+* Not storing the tokens in the configurations or code.
+
+config.json
+
+```
 { 
     "type_val": "general",
     "src_url": "https://old_vault.example.com",
@@ -47,29 +45,53 @@ This config file is used to reduce the amout of command line arguments and limit
     "config_file":"./config.yaml"
 }
 ```
-**Explaination of keys and values**
 
-| Key | Value |
-| --- | ----- |
-| type_value | type of secrets engine in the source vault instance |
-| src_url | the source vault instance url |
-| dest_url | the destination vault instance url |
-| tmp_file | this is the name of the output temp json file. You should not need to change this value|
-| config_file | the name of this file |
+### Explanation of keys and values
 
+| Key           | Value                                                                           |
+| ---           | -----                                                                           |
+| `type_value`  | The type of secrets engine in the source vault instance                         |
+| `src_url`     | The source vault instance URL                                                   |
+| `dest_url`    | the destination vault instance URL                                              |
+| `tmp_file`    | The name of the output temp JSON file; you should not need to change this value |
+| `config_file` | The name of this file                                                           |
 
-This code assumes that both the Hashi Vault client and jq are installed before you start.  There is a test for both of these in the script.
+---
 
-###### Simple install instructions that hopefully will work
-macOS: If you are using brew package manager:
+## 2. Installation instructions
+=======
+
+The code assumes that both the Hashi Vault client and jq are installed before you start and tests for the presence of both.
+
+### Installing Vault and jq
+
+If you are using the Homebrew package manager on mac OS, run the following:
+
 ```
  $ brew install jq
  $ brew install vault
 ```
-I only tested and ran this on macOS, but not on Windows or any Linux distributions. I will test Ubuntu at some point and refactor as needed.
+
+This script has not been tested on Windows or Linux, only macOS. I will test Ubuntu at some point and refactor as needed.
+
+### Installing the script
+
+```
+# Clone the repo and then change to the directory.
+$ git clone <this repo url>
+$ cd vault_kv_migration
+
+# Run the script
+$ vault_kv_migration.sh -s "${SRC_TOKEN}" -d "${DEST_TOKEN}" -p "${VAULT_PATH}"
+Usage:
+  Format : ./vault_kv_migrator.sh {source token} {destination token} {path}
+  Example: ./vault_kv_migrator.sh -s xxxxxxx -d xxxxxxx -p /secret/cnn/
+  Note   : A trailing slash in path is required."
+```
 
 ---
-### Running the script
+
+## 3. Running the script
 
 Command line arguments description
 
@@ -85,39 +107,44 @@ Usage:
 
 ---
 
-#### Here is a bunch of randomish stuff to get started.
+## 4. Useful commands and randomish stuff
 
-Useful vault commands to get started
+## Log in to Vault
 
-**login**
 ```
 export VAULT_ADDR=https://vault.example.com
 vault login -method=ldap mount=ad username=mick
 ```
 
-**view login name**
+View login name**
 ```
 TOKEN=$(vault print token) | vault token lookup $TOKEN
 ```
 
-**vault logout, I know strange, but effective**
+### Log out of Vault
+
+I know; strange, but effective.
+
 ```
 rm ~/.vault-token
 ```
 
-**check the status**
+### Check status
+
 ```
 vault status
 ```
 
-**create a secretes engine**
+### Create a secretes engine
+
 ```
 vault secrets enable -path=kv kv-v2
 vault kv enable-versioning kv
 vault write kv/config max_versions=4
 ```
 
-**create ad groups**
+### Create Active Directory groups
+
 ```
 vault write auth/ad/groups/admin-group policies=admins,app1,app1
 vault write auth/ad/groups/app-group policies=app1,app2
@@ -126,14 +153,16 @@ vault read auth/ad/groups/app-group
 vault list auth/ad/groups
 ```
 
-**create a policy**
+### Create a policy
+
 ```
 vault policy write admins ./admins-policy.hcl
 vault policy list
 vault policy read admins
 ```
 
-**create 2 secrets**
+### Create two secrets
+
 ```
 vault kv put kv/anthos/test test=12345
 vault kv put kv/gcp/test test=12345
@@ -143,7 +172,21 @@ vault kv list kv/gco
 vault kv list -format=json kv/gcp
 ```
 
-**Terraform Vault Provider Info**
-*This is a good starting place to learn the provider:*
-https://learn.hashicorp.com/tutorials/vault/codify-mgmt-enterprise
-https://registry.terraform.io/providers/hashicorp/vault/latest/docs
+---
+
+## 5. References
+
+Below are a couple of good references for learning the Terraform Vault provder information:
+
+* https://learn.hashicorp.com/tutorials/vault/codify-mgmt-enterprise
+* https://registry.terraform.io/providers/hashicorp/vault/latest/docs
+
+---
+
+## 6. Acknowledgements
+
+Many thanks to the following folks:
+
+* agaudreault-jive (https://github.com/hashicorp/vault/issues/5275)
+* user2599522 (https://stackoverflow.com/a/61000422)
+* kir4h (https://github.com/kir4h/rvault)
