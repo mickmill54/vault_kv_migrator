@@ -38,7 +38,7 @@ function cmd_line_error {
   echo "You typed:" "${0}" -s "${SRC_TOKEN}" -d "${DEST_TOKEN}" -p "${VAULT_PATH}"
   echo
   echo "Usage: "
-  echo "format : " "${0} " {source token} {destination token} {path}
+  echo "format : " "${0} " -s {source token} -d {destination token} -p {path}
   echo "example: " "${0} " "-s xxxxxxx -d xxxxxxx -p /secret/cnn/"
   echo "Note: trailing slash in path is important"
   echo "$arg1"
