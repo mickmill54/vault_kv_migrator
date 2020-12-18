@@ -33,7 +33,7 @@ function cmd_line_error {
   arg1="${1}"
   echo
   echo ===============================================================================
-  echo "Missing command line values."
+  echo "Command line arguments descirption."
   echo "You typed:" "${0}" -s "${SRC_TOKEN}" -d "${DEST_TOKEN}" -p "${VAULT_PATH}"
   echo
   echo "Usage: "
