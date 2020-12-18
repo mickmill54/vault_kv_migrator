@@ -104,12 +104,12 @@ function load_config {
     exit
   else
     # load the file variables
-    TMP_FILE=$(cat ./config.json | jq .tmp_file)
+    TMP_FILE=$(cat ${CONFIG_FILE} | jq .tmp_file)
     TMP_FILE=$(sed -e 's/^"//' -e 's/"$//' <<<$TMP_FILE) # remove double quotes
-    TYPE_VAL=$(cat ./config.json | jq .type_val)
-    SRC_URL=$(cat ./config.json | jq .src_url)
+    TYPE_VAL=$(cat ${CONFIG_FILE} | jq .type_val)
+    SRC_URL=$(cat ${CONFIG_FILE} | jq .src_url)
     SRC_URL=$(sed -e 's/^"//' -e 's/"$//' <<<$SRC_URL) # remove double quotes
-    DEST_URL=$(cat ./config.json | jq .dest_url)   
+    DEST_URL=$(cat ${CONFIG_FILE} | jq .dest_url)   
     DEST_URL=$(sed -e 's/^"//' -e 's/"$//' <<<$DEST_URL) # remove double quotes
     # Run time parameters
   fi
