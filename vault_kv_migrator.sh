@@ -129,7 +129,7 @@ function get_keys_from_dev {
   
   # Might not need a for loop here because I am passing in the path
   for VAULT in "${VAULTS}"; do
-    echo "DEBUG ${LINENO}: Main for loop control given path: " $VAULT "in" $VAULTS
+    # echo "DEBUG ${LINENO}: Main for loop control given path: " $VAULT "in" $VAULTS
     recurse "${VAULT}"
   done
 }
@@ -148,7 +148,7 @@ function recurse {
 
     # List all folders for a given path 
     LIST_DIRS_KEYS=$(vault kv list -format=json "${KEY_PATH}" 2>&1)
-    echo "DEBUG ${LINENO}: Keys under: $arg1" "$LIST_DIRS_KEYS"
+    # echo "DEBUG ${LINENO}: Keys under: $arg1" "$LIST_DIRS_KEYS"
     status="${?}"
     if [ ! "${status}" -eq 0 ];
     then
@@ -182,7 +182,7 @@ function write_key_to_prod {
   export VAULT_TOKEN="${DST_TOKEN}"
   export VAULT_ADDR="${DST_URL}"
   
-  # echo "Destination token: "
+  # echo "DEBUG ${LINENO}: Destination token: "
   # TOKEN=$(vault print token) | vault token lookup -format=json $TOKEN | jq .data.id
   
   echo "Get key from DV path: " "${KEY_PATH2}${SECRET2}"
@@ -198,7 +198,7 @@ function write_key_to_prod {
   # echo $PUT_RESULT
   
   # GET_RESULT=$(vault kv get $DST_PATH)
-  # echo $GET_RESULT
+  # echo "DEBUG ${LINENO}: Current KV = " $GET_RESULT 
   echo =====================================================================================================
   echo
   
@@ -206,7 +206,7 @@ function write_key_to_prod {
   export VAULT_TOKEN="${SRC_TOKEN}"
   export VAULT_ADDR="${SRC_URL}"
   
-  # echo "Source token: " 
+  # echo ""DEBUG ${LINENO}:Source token: " 
   # TOKEN=$(vault print token) | vault token lookup -format=json $TOKEN | jq .data.id
   echo "Start reading new key..."
 }
