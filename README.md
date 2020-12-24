@@ -13,7 +13,7 @@ This bash script was built primarily to migrate a ton of secrets from an old, op
 1. The config.json file
 2. Installation instructions
 3. Running the script
-4. Useful commands and randomish stuff
+4. Useful commands and random-ish stuff
 5. References
 6. Acknowledgements
 
@@ -29,7 +29,7 @@ A couple of notes before diving in:
 
 ## 1. The config.json file
 
-This configuration file is used to reduce the amout of command line arguments and limit the arguments to:
+This configuration file is used to reduce the amount of command line arguments and limit the arguments to:
 
 * The path to find the secrets; and
 * Not storing the tokens in the configurations or code.
@@ -107,7 +107,7 @@ Usage:
 
 ---
 
-## 4. Useful commands and randomish stuff
+## 4. Useful commands and random-ish stuff
 
 ## Log in to Vault
 
@@ -176,7 +176,7 @@ vault kv list -format=json kv/gcp
 
 ## 5. References
 
-Below are a couple of good references for learning the Terraform Vault provder information:
+Below are a couple of good references for learning the Terraform Vault provider information:
 
 * https://learn.hashicorp.com/tutorials/vault/codify-mgmt-enterprise
 * https://registry.terraform.io/providers/hashicorp/vault/latest/docs
