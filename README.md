@@ -168,7 +168,7 @@ vault kv put kv/anthos/test test=12345
 vault kv put kv/gcp/test test=12345
 
 vault kv list kv/anthos
-vault kv list kv/gco
+vault kv list kv/gcp
 vault kv list -format=json kv/gcp
 ```
 
